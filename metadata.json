@@ -1,0 +1,6 @@
+{
+  "name": "CampusIQ — The Student OS",
+  "version": "3.2",
+  "description": "Version 3.2: CampusIQ is an AI-driven superapp for students in Nairobi, integrating social life (Campus Pulse), peer-to-peer trading (Campus Market), academics (StudyIQ), finance (FinIQ), and creativity (CreateIQ) with performance enhancements.",
+  "requestFramePermissions": []
+}
