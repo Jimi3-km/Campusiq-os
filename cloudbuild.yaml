@@ -1,25 +1,40 @@
 steps:
-  # Step 1: Build the image using the Dockerfile
-  # We use the standard docker cloud-builder.
+  # Step 1: Build the image
   - name: 'gcr.io/cloud-builders/docker'
-    id: 'Build Docker Image'
+    id: 'Build'
     args: 
       - 'build'
       - '-t'
       - '$_AR_HOSTNAME/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$COMMIT_SHA'
       - '.'
 
-  # Step 2: Push the image to the registry
+  # Step 2: Push the image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
-    id: 'Push Image'
+    id: 'Push'
     args: 
       - 'push'
       - '$_AR_HOSTNAME/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$COMMIT_SHA'
 
-# --- THE FIX IS HERE ---
+  # Step 3: Deploy to Cloud Run (The Fix)
+  # We use the Cloud SDK builder to run 'gcloud run deploy'
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'Deploy'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - '$_SERVICE_NAME'              # Name of your Cloud Run service
+      - '--image'
+      - '$_AR_HOSTNAME/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$COMMIT_SHA'
+      - '--region'
+      - '$_DEPLOY_REGION'
+      - '--port'
+      - '80'                          # <--- THIS FIXES THE PORT ERROR
+      - '--allow-unauthenticated'     # Optional: Makes it public immediately
+
+# Force logs to Cloud Logging to fix the "build.service_account" error
 options:
-  # explicit logging configuration satisfies the service account requirement
-  logging: CLOUD_LOGGING_ONLY 
+  logging: CLOUD_LOGGING_ONLY
 
 # Substitutions allow you to pass variables at build time.
 # Defaults are provided here, but you should override them in your Trigger settings.
@@ -27,3 +42,5 @@ substitutions:
   _AR_HOSTNAME: 'us-central1-docker.pkg.dev' # Change to your region/registry
   _REPO_NAME: 'gcp-hackathon'                      # Change to your Artifact Registry repo
   _IMAGE_NAME: 'campusiq'                 # Your image name
+  _SERVICE_NAME: 'my-vite-service'  # Name for the Cloud Run service
+  _DEPLOY_REGION: 'us-central1'
