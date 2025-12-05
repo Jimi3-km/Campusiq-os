@@ -25,5 +25,5 @@ options:
 # Defaults are provided here, but you should override them in your Trigger settings.
 substitutions:
   _AR_HOSTNAME: 'us-central1-docker.pkg.dev' # Change to your region/registry
-  _REPO_NAME: 'my-repo'                      # Change to your Artifact Registry repo
-  _IMAGE_NAME: 'my-vite-app'                 # Your image name
+  _REPO_NAME: 'gcp-hackathon'                      # Change to your Artifact Registry repo
+  _IMAGE_NAME: 'campusiq'                 # Your image name
